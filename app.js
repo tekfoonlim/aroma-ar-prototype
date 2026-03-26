@@ -7,6 +7,9 @@ let controller;
 let reticle;
 let model;
 let placedObject = null;
+let initialDistance = 0;
+let initialScale = 1;
+let isPinching = false;
 
 init();
 animate();
@@ -20,15 +23,22 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
 
-  // ✅ IMPORTANT FIX
   renderer.xr.setReferenceSpaceType('local');
 
   document.body.appendChild(renderer.domElement);
 
+  // ADD TOUCH CONTROLS HERE
+  renderer.domElement.addEventListener('touchstart', onTouchStart, false);
+  renderer.domElement.addEventListener('touchmove', onTouchMove, false);
+  renderer.domElement.addEventListener('touchend', () => {
+    isPinching = false;
+  });
+
   // AR Button
-  document.body.appendChild(ARButton.createButton(renderer, {
+  const arButton = ARButton.createButton(renderer, {
     requiredFeatures: ['hit-test']
-  }));
+  });
+  document.body.appendChild(arButton);
 
   // Light
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
@@ -38,34 +48,23 @@ function init() {
   const geometry = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI / 2);
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   reticle = new THREE.Mesh(geometry, material);
-  reticle.matrixAutoUpdate = false; // ✅ IMPORTANT
+  reticle.matrixAutoUpdate = false;
   reticle.visible = false;
   scene.add(reticle);
 
   // Load model
   const loader = new GLTFLoader();
   loader.load('model.glb', (gltf) => {
-  model = gltf.scene;
+    model = gltf.scene;
 
-  console.log("MODEL STRUCTURE:", model);
+    console.log("MODEL STRUCTURE:", model);
 
-  model.traverse((child) => {
-    if (child.isMesh) {
-      console.log("Mesh:", child.name);
-    }
+    model.traverse((child) => {
+      if (child.isMesh) {
+        console.log("Mesh:", child.name);
+      }
+    });
   });
-});
-  // loader.load(
-  //   'model.glb',
-  //   (gltf) => {
-  //     console.log("Model loaded ✅");
-  //     model = gltf.scene;
-  //   },
-  //   undefined,
-  //   (error) => {
-  //     console.error("Model load error ❌", error);
-  //   }
-  // );
 
   controller = renderer.xr.getController(0);
   controller.addEventListener('select', onSelect);
@@ -162,4 +161,45 @@ function render(timestamp, frame) {
   }
 
   renderer.render(scene, camera);
+}
+function getDistance(touch1, touch2) {
+  const dx = touch1.pageX - touch2.pageX;
+  const dy = touch1.pageY - touch2.pageY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function onTouchStart(event) {
+  if (!placedObject) return;
+
+  if (event.touches.length === 2) {
+    // Pinch start
+    isPinching = true;
+    initialDistance = getDistance(event.touches[0], event.touches[1]);
+    initialScale = placedObject.scale.x;
+  }
+}
+
+function onTouchMove(event) {
+  if (!placedObject) return;
+
+  // PINCH TO SCALE
+  if (event.touches.length === 2 && isPinching) {
+    const newDistance = getDistance(event.touches[0], event.touches[1]);
+    const scaleFactor = newDistance / initialDistance;
+
+    let newScale = initialScale * scaleFactor;
+
+    // Limit scale (important)
+    newScale = Math.max(0.05, Math.min(newScale, 1.5));
+
+    placedObject.scale.set(newScale, newScale, newScale);
+  }
+
+  //  SINGLE TOUCH → ROTATE
+  if (event.touches.length === 1 && !isPinching) {
+    const touch = event.touches[0];
+
+    // Rotate based on horizontal movement
+    placedObject.rotation.y += 0.01;
+  }
 }
