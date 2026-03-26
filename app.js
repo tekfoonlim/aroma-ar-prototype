@@ -18,6 +18,10 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
+
+  // ✅ IMPORTANT FIX
+  renderer.xr.setReferenceSpaceType('local');
+
   document.body.appendChild(renderer.domElement);
 
   // AR Button
@@ -29,20 +33,28 @@ function init() {
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
   scene.add(light);
 
-  // Reticle (shows placement point)
+  // Reticle
   const geometry = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI / 2);
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   reticle = new THREE.Mesh(geometry, material);
+  reticle.matrixAutoUpdate = false; // ✅ IMPORTANT
   reticle.visible = false;
   scene.add(reticle);
 
-  // Load 3D model
+  // Load model
   const loader = new GLTFLoader();
-  loader.load('model.glb', (gltf) => {
-    model = gltf.scene;
-  });
+  loader.load(
+    'model.glb',
+    (gltf) => {
+      console.log("Model loaded ✅");
+      model = gltf.scene;
+    },
+    undefined,
+    (error) => {
+      console.error("Model load error ❌", error);
+    }
+  );
 
-  // Controller (tap)
   controller = renderer.xr.getController(0);
   controller.addEventListener('select', onSelect);
   scene.add(controller);
