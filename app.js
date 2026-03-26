@@ -28,6 +28,21 @@ function init() {
   document.body.appendChild(ARButton.createButton(renderer, {
     requiredFeatures: ['hit-test']
   }));
+  document.body.appendChild(arButton);
+
+// ✅ Center the button
+arButton.style.position = 'absolute';
+arButton.style.top = '50%';
+arButton.style.left = '50%';
+arButton.style.transform = 'translate(-50%, -50%)';
+arButton.style.zIndex = '10';
+
+// Optional styling
+arButton.style.background = 'rgba(0,0,0,0.8)';
+arButton.style.color = '#fff';
+arButton.style.padding = '14px 20px';
+arButton.style.borderRadius = '10px';
+arButton.style.fontSize = '16px';
 
   // Light
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
