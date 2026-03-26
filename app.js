@@ -1,6 +1,6 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
-import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/webxr/ARButton.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'https://esm.sh/three@0.160.0';
+import { ARButton } from 'https://esm.sh/three@0.160.0/examples/jsm/webxr/ARButton.js';
+import { GLTFLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 
 let camera, scene, renderer;
 let controller;
@@ -43,17 +43,28 @@ function init() {
 
   // Load model
   const loader = new GLTFLoader();
-  loader.load(
-    'model.glb',
-    (gltf) => {
-      console.log("Model loaded ✅");
-      model = gltf.scene;
-    },
-    undefined,
-    (error) => {
-      console.error("Model load error ❌", error);
+  loader.load('model.glb', (gltf) => {
+  model = gltf.scene;
+
+  console.log("MODEL STRUCTURE:", model);
+
+  model.traverse((child) => {
+    if (child.isMesh) {
+      console.log("Mesh:", child.name);
     }
-  );
+  });
+});
+  // loader.load(
+  //   'model.glb',
+  //   (gltf) => {
+  //     console.log("Model loaded ✅");
+  //     model = gltf.scene;
+  //   },
+  //   undefined,
+  //   (error) => {
+  //     console.error("Model load error ❌", error);
+  //   }
+  // );
 
   controller = renderer.xr.getController(0);
   controller.addEventListener('select', onSelect);
