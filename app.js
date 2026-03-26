@@ -88,7 +88,7 @@ function onSelect() {
     scene.add(clone);
     placedObject = clone;
 
-    animateObject(clone);
+    // animateObject(clone);
   } 
   else {
     // 🔥 Fallback: place in front of camera
@@ -99,18 +99,18 @@ function onSelect() {
     scene.add(clone);
     placedObject = clone;
 
-    animateObject(clone);
+    // animateObject(clone);
   }
 }
 
 // Simple rotation animation
-function animateObject(obj) {
-  function rotate() {
-    obj.rotation.y += 0.01;
-    requestAnimationFrame(rotate);
-  }
-  rotate();
-}
+// function animateObject(obj) {
+//   function rotate() {
+//     obj.rotation.y += 0.01;
+//     requestAnimationFrame(rotate);
+//   }
+//   rotate();
+// }
 
 let hitTestSource = null;
 let localSpace = null;
