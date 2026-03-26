@@ -10,6 +10,9 @@ let placedObject = null;
 let initialDistance = 0;
 let initialScale = 1;
 let isPinching = false;
+let isInteracting = false;
+let initialAngle = 0;
+let initialRotation = 0;
 
 init();
 animate();
@@ -26,12 +29,14 @@ function init() {
   renderer.xr.setReferenceSpaceType('local');
 
   document.body.appendChild(renderer.domElement);
+  renderer.domElement.style.touchAction = 'none';
 
   // ADD TOUCH CONTROLS HERE
   renderer.domElement.addEventListener('touchstart', onTouchStart, false);
   renderer.domElement.addEventListener('touchmove', onTouchMove, false);
   renderer.domElement.addEventListener('touchend', () => {
     isPinching = false;
+    isInteracting = false;
   });
 
   // AR Button
@@ -72,6 +77,7 @@ function init() {
 }
 
 function onSelect() {
+  if (isInteracting) return;
   if (!model) return;
 
   // If reticle is visible → use it
@@ -171,35 +177,62 @@ function getDistance(touch1, touch2) {
 function onTouchStart(event) {
   if (!placedObject) return;
 
+  isInteracting = true;
+
   if (event.touches.length === 2) {
-    // Pinch start
     isPinching = true;
     initialDistance = getDistance(event.touches[0], event.touches[1]);
     initialScale = placedObject.scale.x;
+
+    // NEW: store rotation angle
+    initialAngle = getAngle(event.touches[0], event.touches[1]);
+    initialRotation = placedObject.rotation.y;
+  }
+
+  if (event.touches.length === 1) {
+    lastTouchX = event.touches[0].pageX;
   }
 }
 
 function onTouchMove(event) {
   if (!placedObject) return;
 
-  // PINCH TO SCALE
+  event.preventDefault();
+
+  // 🔥 PINCH + ROTATE (2 fingers)
   if (event.touches.length === 2 && isPinching) {
-    const newDistance = getDistance(event.touches[0], event.touches[1]);
+    const t1 = event.touches[0];
+    const t2 = event.touches[1];
+
+    // SCALE
+    const newDistance = getDistance(t1, t2);
     const scaleFactor = newDistance / initialDistance;
 
     let newScale = initialScale * scaleFactor;
-
-    // Limit scale (important)
     newScale = Math.max(0.05, Math.min(newScale, 1.5));
 
     placedObject.scale.set(newScale, newScale, newScale);
+
+    // 🔥 ROTATE (twist)
+    const currentAngle = getAngle(t1, t2);
+    const angleDelta = currentAngle - initialAngle;
+
+    placedObject.rotation.y = initialRotation + angleDelta;
   }
 
-  //  SINGLE TOUCH → ROTATE
+  // 🔄 SINGLE FINGER ROTATE
   if (event.touches.length === 1 && !isPinching) {
     const touch = event.touches[0];
+    const deltaX = touch.pageX - lastTouchX;
 
-    // Rotate based on horizontal movement
-    placedObject.rotation.y += 0.01;
+    placedObject.rotation.y += deltaX * 0.01;
+
+    lastTouchX = touch.pageX;
   }
+}
+function getAngle(touch1, touch2) {
+  return Math.atan2(
+    touch2.pageY - touch1.pageY,
+    touch2.pageX - touch1.pageX
+  );
 }
