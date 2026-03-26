@@ -6,6 +6,7 @@ let camera, scene, renderer;
 let controller;
 let reticle;
 let model;
+let placedObject = null;
 
 init();
 animate();
@@ -72,18 +73,25 @@ function init() {
 }
 
 function onSelect() {
-  if (reticle.visible && model) {
-    const clone = model.clone();
-    clone.position.setFromMatrixPosition(reticle.matrix);
+  function onSelect() {
+  if (!reticle.visible || !model) return;
 
-    // Default scale
-    clone.scale.set(0.05, 0.05, 0.05);
-
-    scene.add(clone);
-
-    // Rotate slowly
-    animateObject(clone);
+  // If object already exists → just move it
+  if (placedObject) {
+    placedObject.position.setFromMatrixPosition(reticle.matrix);
+    return;
   }
+
+  // Otherwise create it once
+  const clone = model.clone();
+  clone.position.setFromMatrixPosition(reticle.matrix);
+  clone.scale.set(0.15, 0.15, 0.15);
+
+  scene.add(clone);
+  placedObject = clone;
+
+  animateObject(clone);
+}
 }
 
 // Simple rotation animation
