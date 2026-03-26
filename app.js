@@ -25,10 +25,12 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   // AR Button
-  document.body.appendChild(ARButton.createButton(renderer, {
-    requiredFeatures: ['hit-test']
-  }));
-  document.body.appendChild(arButton);
+const arButton = ARButton.createButton(renderer, {
+  requiredFeatures: ['hit-test']
+});
+
+// Add to DOM
+document.body.appendChild(arButton);
 
 // ✅ Center the button
 arButton.style.position = 'absolute';
@@ -37,12 +39,18 @@ arButton.style.left = '50%';
 arButton.style.transform = 'translate(-50%, -50%)';
 arButton.style.zIndex = '10';
 
-// Optional styling
-arButton.style.background = 'rgba(0,0,0,0.8)';
-arButton.style.color = '#fff';
-arButton.style.padding = '14px 20px';
-arButton.style.borderRadius = '10px';
+// ✅ Better styling
+arButton.style.background = 'rgba(0,0,0,0.85)';
+arButton.style.color = '#ffffff';
+arButton.style.padding = '14px 22px';
+arButton.style.borderRadius = '12px';
 arButton.style.fontSize = '16px';
+arButton.style.fontWeight = 'bold';
+arButton.style.border = 'none';
+arButton.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+
+// Optional: change text
+arButton.textContent = "🍔 View in AR";
 
   // Light
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
