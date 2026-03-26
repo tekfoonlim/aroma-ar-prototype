@@ -146,9 +146,18 @@ function render(timestamp, frame) {
 
         reticle.visible = true;
         reticle.matrix.fromArray(pose.transform.matrix);
+
+        // ✅ SHOW READY MESSAGE
+        document.getElementById("overlay").innerText = "Tap to place 🍔";
       } else {
         reticle.visible = false;
+
+        // ✅ SHOW SCANNING MESSAGE
+        document.getElementById("overlay").innerText = "Move phone to detect surface...";
       }
+    } else {
+      // ✅ INITIAL STATE
+      document.getElementById("overlay").innerText = "Starting AR...";
     }
   }
 
