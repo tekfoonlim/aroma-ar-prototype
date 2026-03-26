@@ -33,7 +33,7 @@ function init() {
 
   // ADD TOUCH CONTROLS HERE
   renderer.domElement.addEventListener('touchstart', onTouchStart, false);
-  renderer.domElement.addEventListener('touchmove', onTouchMove, false);
+  renderer.domElement.addEventListener('touchmove', onTouchMove, false, { passive: false });
   renderer.domElement.addEventListener('touchend', () => {
     isPinching = false;
     isInteracting = false;
@@ -195,6 +195,7 @@ function onTouchStart(event) {
 }
 
 function onTouchMove(event) {
+  event.preventDefault();
   if (!placedObject) return;
 
   event.preventDefault();
@@ -217,7 +218,11 @@ function onTouchMove(event) {
     const currentAngle = getAngle(t1, t2);
     const angleDelta = currentAngle - initialAngle;
 
-    placedObject.rotation.y = initialRotation + angleDelta;
+    // ✅ amplify + accumulate instead of overwrite
+    placedObject.rotation.y += angleDelta * 1.5;
+
+    // update reference so it continues smoothly
+    initialAngle = currentAngle;
   }
 
   // 🔄 SINGLE FINGER ROTATE
