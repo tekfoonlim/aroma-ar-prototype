@@ -13,3 +13,13 @@ body {
   z-index: 10;
   pointer-events: none;
 }
+button {
+  background: #000000cc !important;
+  color: #ffffff !important;
+  font-weight: bold;
+  border: none;
+  padding: 14px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}

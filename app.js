@@ -77,7 +77,7 @@ function onSelect() {
     clone.position.setFromMatrixPosition(reticle.matrix);
 
     // Default scale
-    clone.scale.set(0.5, 0.5, 0.5);
+    clone.scale.set(0.15, 0.15, 0.15);
 
     scene.add(clone);
 
