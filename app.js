@@ -73,25 +73,35 @@ function init() {
 }
 
 function onSelect() {
-  function onSelect() {
-  if (!reticle.visible || !model) return;
+  if (!model) return;
 
-  // If object already exists → just move it
-  if (placedObject) {
-    placedObject.position.setFromMatrixPosition(reticle.matrix);
-    return;
+  // If reticle is visible → use it
+  if (reticle.visible) {
+    if (placedObject) {
+      placedObject.position.setFromMatrixPosition(reticle.matrix);
+      return;
+    }
+
+    const clone = model.clone();
+    clone.position.setFromMatrixPosition(reticle.matrix);
+    clone.scale.set(0.15, 0.15, 0.15);
+
+    scene.add(clone);
+    placedObject = clone;
+
+    animateObject(clone);
+  } 
+  else {
+    // 🔥 Fallback: place in front of camera
+    const clone = model.clone();
+    clone.position.set(0, 0, -1); // 1 meter in front
+    clone.scale.set(0.15, 0.15, 0.15);
+
+    scene.add(clone);
+    placedObject = clone;
+
+    animateObject(clone);
   }
-
-  // Otherwise create it once
-  const clone = model.clone();
-  clone.position.setFromMatrixPosition(reticle.matrix);
-  clone.scale.set(0.15, 0.15, 0.15);
-
-  scene.add(clone);
-  placedObject = clone;
-
-  animateObject(clone);
-}
 }
 
 // Simple rotation animation
