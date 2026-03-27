@@ -57,7 +57,6 @@ function init() {
 function onSelect() {
   if (!model) return;
 
-  // ✅ IF already placed → MOVE it (no duplication)
   if (placedObject) {
     if (reticle.visible) {
       placedObject.position.setFromMatrixPosition(reticle.matrix);
@@ -65,7 +64,6 @@ function onSelect() {
     return;
   }
 
-  // ✅ FIRST TIME → CREATE
   const clone = model.clone();
 
   if (reticle.visible) {
@@ -74,7 +72,7 @@ function onSelect() {
     clone.position.set(0, 0, -1);
   }
 
-  clone.scale.set(0.15, 0.15, 0.15);
+  clone.scale.set(0.05, 0.05, 0.05);
 
   scene.add(clone);
   placedObject = clone;
