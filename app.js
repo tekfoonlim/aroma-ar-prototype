@@ -55,11 +55,17 @@ function init() {
 }
 
 function onSelect() {
-  // 🚫 already placed → do nothing
-  if (hasPlaced) return;
-
   if (!model) return;
 
+  // ✅ IF already placed → MOVE it (no duplication)
+  if (placedObject) {
+    if (reticle.visible) {
+      placedObject.position.setFromMatrixPosition(reticle.matrix);
+    }
+    return;
+  }
+
+  // ✅ FIRST TIME → CREATE
   const clone = model.clone();
 
   if (reticle.visible) {
@@ -72,9 +78,6 @@ function onSelect() {
 
   scene.add(clone);
   placedObject = clone;
-
-  // ✅ mark placed
-  hasPlaced = true;
 }
 
 let hitTestSource = null;
