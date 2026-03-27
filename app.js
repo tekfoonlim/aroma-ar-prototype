@@ -82,10 +82,10 @@ function onSelect() {
 
   // If reticle is visible → use it
   if (reticle.visible) {
-    if (placedObject) {
-      placedObject.position.setFromMatrixPosition(reticle.matrix);
-      return;
-    }
+    // if (placedObject) {
+    //   placedObject.position.setFromMatrixPosition(reticle.matrix);
+    //   return;
+    // }
 
     const clone = model.clone();
     clone.position.setFromMatrixPosition(reticle.matrix);
