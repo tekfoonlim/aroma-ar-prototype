@@ -105,7 +105,7 @@ function onSelect() {
     clone.position.set(0, 0, -1);
   }
 
-  clone.scale.set(0.25, 0.25, 0.25);
+  clone.scale.set(0.15, 0.15, 0.15);
 
   scene.add(clone);
   placedObject = clone;
