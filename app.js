@@ -1,19 +1,22 @@
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { ARButton } from 'https://esm.sh/three@0.160.0/examples/jsm/webxr/ARButton.js';
 import { GLTFLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/DRACOLoader.js';
 
 let camera, scene, renderer;
 let controller;
 let reticle;
 let model;
 let placedObject = null;
-let hasPlaced = false; // ✅ prevent duplication
+let hasPlaced = false; 
+let overlay;
 
 init();
 animate();
 
 function init() {
   scene = new THREE.Scene();
+  overlay = document.getElementById("overlay");
 
   camera = new THREE.PerspectiveCamera();
 
@@ -42,16 +45,46 @@ function init() {
   reticle.visible = false;
   scene.add(reticle);
 
+  const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
   // Load model
   const loader = new GLTFLoader();
-  loader.load('model.glb', (gltf) => {
+loader.setDRACOLoader(dracoLoader);
+
+// 🔥 Show loading text
+overlay.innerText = "Loading model... ⏳";
+
+loader.load(
+  'model.glb',
+  (gltf) => {
     model = gltf.scene;
-  });
+
+    // ✅ Optimize model
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = false;
+        child.receiveShadow = false;
+
+        // 🔥 reduce GPU cost
+        child.frustumCulled = true;
+      }
+    });
+
+    overlay.innerText = "Scan surface to place 🍔";
+  },
+  undefined,
+  (error) => {
+    console.error(error);
+    overlay.innerText = "Failed to load model ❌";
+  }
+);
 
   // Controller
   controller = renderer.xr.getController(0);
   controller.addEventListener('select', onSelect);
   scene.add(controller);
+  // 🔥 Warm up GPU
+renderer.compile(scene, camera);
 }
 
 function onSelect() {
@@ -64,7 +97,7 @@ function onSelect() {
     return;
   }
 
-  const clone = model.clone();
+  const clone = model.clone(true);
 
   if (reticle.visible) {
     clone.position.setFromMatrixPosition(reticle.matrix);
@@ -111,20 +144,20 @@ function render(timestamp, frame) {
         reticle.visible = true;
         reticle.matrix.fromArray(pose.transform.matrix);
 
-        document.getElementById("overlay").innerText = "Tap to place 🍔";
+        overlay.innerText = "Tap to place 🍔";
       } else {
         reticle.visible = false;
-        document.getElementById("overlay").innerText = "Move phone to detect surface...";
+        overlay.innerText = "Move phone to detect surface...";
       }
     } else {
-      document.getElementById("overlay").innerText = "Starting AR...";
+     overlay.innerText = "Starting AR...";
     }
   }
 
   // ✅ AUTO ROTATION (SAFE HERE)
   if (placedObject) {
-    placedObject.rotation.y += 0.01;
-  }
+  placedObject.rotation.y += 0.008;
+}
 
   renderer.render(scene, camera);
 }
