@@ -82,10 +82,10 @@ function onSelect() {
 
   // If reticle is visible → use it
   if (reticle.visible) {
-    // if (placedObject) {
-    //   placedObject.position.setFromMatrixPosition(reticle.matrix);
-    //   return;
-    // }
+    if (placedObject) {
+      placedObject.position.setFromMatrixPosition(reticle.matrix);
+      return;
+    }
 
     const clone = model.clone();
     clone.position.setFromMatrixPosition(reticle.matrix);
@@ -94,7 +94,7 @@ function onSelect() {
     scene.add(clone);
     placedObject = clone;
 
-    // animateObject(clone);
+    animateObject(clone);
   } 
   else {
     // 🔥 Fallback: place in front of camera
@@ -105,18 +105,18 @@ function onSelect() {
     scene.add(clone);
     placedObject = clone;
 
-    // animateObject(clone);
+    animateObject(clone);
   }
 }
 
 // Simple rotation animation
-// function animateObject(obj) {
-//   function rotate() {
-//     obj.rotation.y += 0.01;
-//     requestAnimationFrame(rotate);
-//   }
-//   rotate();
-// }
+function animateObject(obj) {
+  function rotate() {
+    obj.rotation.y += 0.01;
+    requestAnimationFrame(rotate);
+  }
+  rotate();
+}
 
 let hitTestSource = null;
 let localSpace = null;
@@ -168,76 +168,76 @@ function render(timestamp, frame) {
 
   renderer.render(scene, camera);
 }
-function getDistance(touch1, touch2) {
-  const dx = touch1.pageX - touch2.pageX;
-  const dy = touch1.pageY - touch2.pageY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
+// function getDistance(touch1, touch2) {
+//   const dx = touch1.pageX - touch2.pageX;
+//   const dy = touch1.pageY - touch2.pageY;
+//   return Math.sqrt(dx * dx + dy * dy);
+// }
 
-function onTouchStart(event) {
-  if (!placedObject) return;
+// function onTouchStart(event) {
+//   if (!placedObject) return;
 
-  isInteracting = true;
+//   isInteracting = true;
 
-  if (event.touches.length === 2) {
-    isPinching = true;
-    initialDistance = getDistance(event.touches[0], event.touches[1]);
-    initialScale = placedObject.scale.x;
+//   if (event.touches.length === 2) {
+//     isPinching = true;
+//     initialDistance = getDistance(event.touches[0], event.touches[1]);
+//     initialScale = placedObject.scale.x;
 
-    // NEW: store rotation angle
-    initialAngle = getAngle(event.touches[0], event.touches[1]);
-    initialRotation = placedObject.rotation.y;
-  }
+//     // NEW: store rotation angle
+//     initialAngle = getAngle(event.touches[0], event.touches[1]);
+//     initialRotation = placedObject.rotation.y;
+//   }
 
-  if (event.touches.length === 1) {
-    lastTouchX = event.touches[0].pageX;
-  }
-}
+//   if (event.touches.length === 1) {
+//     lastTouchX = event.touches[0].pageX;
+//   }
+// }
 
-function onTouchMove(event) {
-  event.preventDefault();
-  if (!placedObject) return;
+// function onTouchMove(event) {
+//   event.preventDefault();
+//   if (!placedObject) return;
 
-  event.preventDefault();
+//   event.preventDefault();
 
-  // 🔥 PINCH + ROTATE (2 fingers)
-  if (event.touches.length === 2 && isPinching) {
-    const t1 = event.touches[0];
-    const t2 = event.touches[1];
+//   // 🔥 PINCH + ROTATE (2 fingers)
+//   if (event.touches.length === 2 && isPinching) {
+//     const t1 = event.touches[0];
+//     const t2 = event.touches[1];
 
-    // SCALE
-    const newDistance = getDistance(t1, t2);
-    const scaleFactor = newDistance / initialDistance;
+//     // SCALE
+//     const newDistance = getDistance(t1, t2);
+//     const scaleFactor = newDistance / initialDistance;
 
-    let newScale = initialScale * scaleFactor;
-    newScale = Math.max(0.05, Math.min(newScale, 1.5));
+//     let newScale = initialScale * scaleFactor;
+//     newScale = Math.max(0.05, Math.min(newScale, 1.5));
 
-    placedObject.scale.set(newScale, newScale, newScale);
+//     placedObject.scale.set(newScale, newScale, newScale);
 
-    // 🔥 ROTATE (twist)
-    const currentAngle = getAngle(t1, t2);
-    const angleDelta = currentAngle - initialAngle;
+//     // 🔥 ROTATE (twist)
+//     const currentAngle = getAngle(t1, t2);
+//     const angleDelta = currentAngle - initialAngle;
 
-    // ✅ amplify + accumulate instead of overwrite
-    placedObject.rotation.y += angleDelta * 1.5;
+//     // ✅ amplify + accumulate instead of overwrite
+//     placedObject.rotation.y += angleDelta * 1.5;
 
-    // update reference so it continues smoothly
-    initialAngle = currentAngle;
-  }
+//     // update reference so it continues smoothly
+//     initialAngle = currentAngle;
+//   }
 
-  // 🔄 SINGLE FINGER ROTATE
-  if (event.touches.length === 1 && !isPinching) {
-    const touch = event.touches[0];
-    const deltaX = touch.pageX - lastTouchX;
+//   // 🔄 SINGLE FINGER ROTATE
+//   if (event.touches.length === 1 && !isPinching) {
+//     const touch = event.touches[0];
+//     const deltaX = touch.pageX - lastTouchX;
 
-    placedObject.rotation.y += deltaX * 0.01;
+//     placedObject.rotation.y += deltaX * 0.01;
 
-    lastTouchX = touch.pageX;
-  }
-}
-function getAngle(touch1, touch2) {
-  return Math.atan2(
-    touch2.pageY - touch1.pageY,
-    touch2.pageX - touch1.pageX
-  );
-}
+//     lastTouchX = touch.pageX;
+//   }
+// }
+// function getAngle(touch1, touch2) {
+//   return Math.atan2(
+//     touch2.pageY - touch1.pageY,
+//     touch2.pageX - touch1.pageX
+//   );
+// }
