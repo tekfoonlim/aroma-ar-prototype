@@ -51,7 +51,7 @@ dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
   const loader = new GLTFLoader();
 loader.setDRACOLoader(dracoLoader);
 
-// 🔥 Show loading text
+// Show loading text
 overlay.innerText = "Loading model... ⏳";
 
 loader.load(
@@ -59,23 +59,23 @@ loader.load(
   (gltf) => {
     model = gltf.scene;
 
-    // ✅ Optimize model
+    // optimize model
     model.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = false;
         child.receiveShadow = false;
 
-        // 🔥 reduce GPU cost
+        // reduce GPU cost
         child.frustumCulled = true;
       }
     });
 
-    overlay.innerText = "Scan surface to place 🍔";
+    overlay.innerText = "Scan surface to place ";
   },
   undefined,
   (error) => {
     console.error(error);
-    overlay.innerText = "Failed to load model ❌";
+    overlay.innerText = "Failed to load model";
   }
 );
 
@@ -83,7 +83,7 @@ loader.load(
   controller = renderer.xr.getController(0);
   controller.addEventListener('select', onSelect);
   scene.add(controller);
-  // 🔥 Warm up GPU
+  // Warm up GPU
 renderer.compile(scene, camera);
 }
 
@@ -105,7 +105,7 @@ function onSelect() {
     clone.position.set(0, 0, -1);
   }
 
-  clone.scale.set(0.05, 0.05, 0.05);
+  clone.scale.set(0.15, 0.15, 0.15);
 
   scene.add(clone);
   placedObject = clone;
