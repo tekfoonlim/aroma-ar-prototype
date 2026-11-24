@@ -7,9 +7,26 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="overlay">
-    <h2>Tap to place 🍽️</h2>
+  <div id="overlay" role="status" aria-live="polite">
+    <h2 id="overlay-message">Checking AR support...</h2>
   </div>
+
+  <main id="fallback" hidden>
+    <section class="fallback-content" aria-labelledby="fallback-title">
+      <h1 id="fallback-title">Aroma AR preview</h1>
+      <p id="fallback-message" role="status" aria-live="polite"></p>
+      <p id="fallback-error" role="alert" hidden></p>
+      <model-viewer
+        id="fallback-model"
+        src="model.glb"
+        alt="3D model preview"
+        camera-controls
+        ar
+        ar-modes="quick-look">
+        <button class="quick-look-button" slot="ar-button">View in your space</button>
+      </model-viewer>
+    </section>
+  </main>
 
   <script type="module" src="app.js"></script>
 </body>

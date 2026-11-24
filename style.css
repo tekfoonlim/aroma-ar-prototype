@@ -4,16 +4,31 @@ body {
   font-family: sans-serif;
 }
 
+canvas {
+  display: block;
+}
+
 #overlay {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
+  position: fixed;
+  right: 0;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: 0;
   text-align: center;
   color: white;
   z-index: 10;
   pointer-events: none;
+  padding: 0 16px;
+  box-sizing: border-box;
+  text-shadow: 0 1px 4px #000;
 }
-button {
+
+#overlay h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+button,
+.quick-look-button {
   background: #000000cc !important;
   color: #ffffff !important;
   font-weight: bold;
@@ -22,4 +37,51 @@ button {
   font-size: 16px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+#fallback {
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  z-index: 20;
+  box-sizing: border-box;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  background: #f5f2ee;
+  color: #211d1a;
+}
+
+.fallback-content {
+  width: min(100%, 720px);
+  min-height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.fallback-content h1,
+.fallback-content p {
+  margin: 0;
+}
+
+#fallback-model {
+  display: block;
+  width: 100%;
+  height: min(65vh, 560px);
+  min-height: 280px;
+  background: #e8e2db;
+  border-radius: 16px;
+}
+
+.quick-look-button {
+  cursor: pointer;
+}
+
+#fallback-error {
+  color: #a32121;
+}
+
+[hidden] {
+  display: none !important;
 }
